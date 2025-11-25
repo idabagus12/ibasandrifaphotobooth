@@ -56,11 +56,21 @@ main {
   width: 100%;
 }
 
+.video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #000;
+}
+
+
 /* Kamera */
 .camera-container {
-  position: relative;
-  top: 1rem;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 4 / 3;
 }
+
 
 #videoElement {
   width: 100%;
