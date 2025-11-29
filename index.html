@@ -41,10 +41,10 @@
 
         <div class="result-container">
           <div class="photo-strip" id="photoStrip">
-            <div class="photo-slot retake-slot" id="slot1" data-slot-index="0"></div>
-            <div class="photo-slot retake-slot" id="slot2" data-slot-index="1"></div>
-            <div class="photo-slot retake-slot" id="slot3" data-slot-index="2"></div>
-            <div class="photo-slot retake-slot" id="slot4" data-slot-index="3"></div>
+            <div class="photo-slot retake-slot" id="slot1" data-slot-index="0" draggable="true"></div>
+            <div class="photo-slot retake-slot" id="slot2" data-slot-index="1" draggable="true"></div>
+            <div class="photo-slot retake-slot" id="slot3" data-slot-index="2" draggable="true"></div>
+            <div class="photo-slot retake-slot" id="slot4" data-slot-index="3" draggable="true"></div>
           </div>
           <img id="finalStrip" class="final-strip" alt="Final photo strip" />
           <div class="controls">
@@ -138,17 +138,33 @@
         });
 
         // Listener untuk Retake Selektif
-        retakeSlots.forEach(slot => {
-            slot.addEventListener('click', () => {
-                const slotIndex = parseInt(slot.dataset.slotIndex);
-                // Hanya izinkan retake jika slot sudah terisi
-                if (capturedPhotos[slotIndex]) {
-                    startRetake(slotIndex);
-                }
-            });
-        });
+        retakeSlots.forEach((slot, index) => {
+          slot.addEventListener('dblclick', () => {
+            if (capturedPhotos[index]) startRetake(index);
+          });
 
-        updateControlVisibility();
+          slot.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', index); // penting!
+          });
+          
+          slot.addEventListener('dragover', (e) => e.preventDefault());
+
+          slot.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetIndex = parseInt(slot.dataset.slotIndex);
+            if (sourceIndex === targetIndex) return;
+
+            // Tukar foto di array
+            const temp = capturedPhotos[sourceIndex];
+            capturedPhotos[sourceIndex] = capturedPhotos[targetIndex];
+            capturedPhotos[targetIndex] = temp;
+
+                // Update UI slot
+            updateSlotsUI();
+          });
+        });
+        updateControlVisibility(); 
       }
 
       // Fungsi utilitas untuk mengontrol visibilitas tombol
@@ -516,7 +532,13 @@
         finalStrip.style.display = 'none';
         photoStrip.style.display = 'flex';
         // Aktifkan lagi Retake Selektif
-        retakeSlots.forEach(slot => slot.style.pointerEvents = 'auto');
+        retakeSlots.forEach((slot, index) => {
+          slot.addEventListener('dblclick', () => {
+            if (capturedPhotos[index]) { // hanya jika ada foto
+              startRetake(index);
+            }
+          });
+        });
         updateControlVisibility();
       }
 
@@ -543,6 +565,18 @@
         if (capturedPhotos.filter(p => p).length === 4) {
           createPhotoStrip();
         }
+      }
+
+      function updateSlotsUI() {
+          capturedPhotos.forEach((photo, index) => {
+              const slot = document.getElementById(`slot${index + 1}`);
+              slot.innerHTML = '';
+              if (photo) {
+                  const img = document.createElement('img');
+                  img.src = photo;
+                  slot.appendChild(img);
+              }
+          });
       }
 
       // Initialize on load
