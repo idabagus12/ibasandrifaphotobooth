@@ -163,8 +163,9 @@
 
         if (currentSlot >= 4) {
           // Selesai 4 Foto
-          captureBtn.style.display = 'none';
-          captureBtn.disabled = true;
+          captureBtn.style.display = 'inline-block';
+          captureBtn.disabled = false;
+          captureBtn.textContent = 'Selesai';
         } else {
           // Sedang Proses (Slot 1, 2, 3, 4)
           captureBtn.style.display = 'inline-block';
@@ -220,6 +221,11 @@
       function startCountdown() {
         // Tentukan slot yang akan diisi. Jika bukan retake, gunakan currentSlot.
         // Jika sedang retake, slotIndexToCapture sudah diatur di startRetake().
+        if (captureBtn.textContent === 'Selesai') {
+          createPhotoStrip();
+          return;
+        }
+        
         if (slotIndexToCapture === undefined || slotIndexToCapture === null) {
             slotIndexToCapture = currentSlot;
         }
@@ -393,10 +399,14 @@
         
         const filledCount = capturedPhotos.filter(p => p).length;
 
-        if (filledCount === 4) {
-          createPhotoStrip();
-        }
-        
+        if (filledCount < 4) {
+          captureBtn.textContent = `Ambil Foto ${filledCount + 1} dari 4`;
+        } else {
+          // jangan auto-generate — ubah menjadi state "Selesai" dan biarkan user klik
+          captureBtn.textContent = 'Selesai';
+          captureBtn.disabled = false;
+          }
+
         updateControlVisibility();
       }
 
