@@ -42,9 +42,13 @@
         <div class="result-container">
           <div class="photo-strip" id="photoStrip">
             <div class="photo-slot retake-slot" id="slot1" data-slot-index="0" draggable="true"></div>
+                <button class="download-slot-btn" data-slot-index="0">Download Foto 1</button>
             <div class="photo-slot retake-slot" id="slot2" data-slot-index="1" draggable="true"></div>
+                <button class="download-slot-btn" data-slot-index="1">Download Foto 2</button>
             <div class="photo-slot retake-slot" id="slot3" data-slot-index="2" draggable="true"></div>
+                <button class="download-slot-btn" data-slot-index="2">Download Foto 3</button>
             <div class="photo-slot retake-slot" id="slot4" data-slot-index="3" draggable="true"></div>
+                <button class="download-slot-btn" data-slot-index="1">Download Foto 4</button>
           </div>
           <img id="finalStrip" class="final-strip" alt="Final photo strip" />
           <div class="controls">
@@ -163,6 +167,21 @@
                 // Update UI slot
             updateSlotsUI();
           });
+        });
+        const downloadSlotBtns = document.querySelectorAll('.download-slot-btn');
+
+        downloadSlotBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = parseInt(btn.dataset.slotIndex);
+            if (capturedPhotos[index]) {
+            const link = document.createElement('a');
+            link.href = capturedPhotos[index];
+            link.download = `photo_slot_${index + 1}.png`;
+            link.click();
+            } else {
+            alert('Foto belum tersedia di slot ini.');
+            }
+        });
         });
         updateControlVisibility(); 
       }
